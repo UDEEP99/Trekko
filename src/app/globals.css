@@ -40,9 +40,10 @@ body {
   transition: background-color 0.5s ease, color 0.5s ease;
 }
 
-/* ─── Custom Scrollbar ─── */
+/* ─── Stealth Custom Scrollbar ─── */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -50,20 +51,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(249, 115, 22, 0.3);
-  border-radius: 99px;
+  background: #475569;
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(249, 115, 22, 0.5);
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: rgba(34, 211, 238, 0.3);
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(34, 211, 238, 0.5);
+  background: #64748b;
 }
 
 /* ─── Glassmorphism (Warm Holiday Tint) ─── */
@@ -274,7 +267,8 @@ body {
   .activity-card:hover {
     box-shadow:
       0 4px 16px rgba(0, 0, 0, 0.07),
-      0 0 0 1px rgba(255, 248, 235, 0.6) inset;
+      0 0 0 1px rgba(255, 248, 235, 0.6) inset,
+      0 8px 24px rgba(249, 115, 22, 0.1);
     border-color: rgba(210, 190, 160, 0.55);
     transform: translateY(-1px);
   }
@@ -291,7 +285,8 @@ body {
     border-color: rgba(51, 65, 85, 0.7);
     box-shadow:
       0 4px 16px rgba(0, 0, 0, 0.2),
-      0 0 0 1px rgba(51, 65, 85, 0.4) inset;
+      0 0 0 1px rgba(51, 65, 85, 0.4) inset,
+      0 8px 24px rgba(249, 115, 22, 0.2);
   }
 
   /* Left column: time + icon */
@@ -708,6 +703,18 @@ body {
 
 /* ─── Gradient Backgrounds ─── */
 @layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .hide-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+
   .bg-page-gradient {
     background:
       radial-gradient(ellipse 100% 60% at 50% -10%, rgba(254, 243, 199, 0.4), transparent 70%),
