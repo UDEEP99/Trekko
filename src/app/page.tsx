@@ -704,9 +704,40 @@ function ImageLightbox({
 }
 
 /* ─── Main Page ─── */
+const DESTINATION_IMAGES = [
+  "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=2000&auto=format&fit=crop", // Paris
+  "https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=2000&auto=format&fit=crop", // Rome
+  "https://images.unsplash.com/photo-1539650116574-8efeb43e2b45?q=80&w=2000&auto=format&fit=crop", // Cairo
+  "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=2000&auto=format&fit=crop", // New York City
+  "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=2000&auto=format&fit=crop", // London
+  "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?q=80&w=2000&auto=format&fit=crop", // Singapore
+  "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=2000&auto=format&fit=crop", // Kyoto
+  "https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=2000&auto=format&fit=crop", // Ha Long Bay
+  "https://images.unsplash.com/photo-1540615801970-1f9e80277256?q=80&w=2000&auto=format&fit=crop", // Siem Reap
+  "https://images.unsplash.com/photo-1537996194471-e657df975ab4?q=80&w=2000&auto=format&fit=crop", // Bali
+  "https://images.unsplash.com/photo-1561134643-66c3a0b5a329?q=80&w=2000&auto=format&fit=crop", // Banff
+  "https://images.unsplash.com/photo-1514282401047-d79a714d24ce?q=80&w=2000&auto=format&fit=crop", // The Maldives
+  "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?q=80&w=2000&auto=format&fit=crop", // Swiss Alps
+  "https://images.unsplash.com/photo-1582967788606-a171c1080cb0?q=80&w=2000&auto=format&fit=crop", // Great Barrier Reef
+  "https://images.unsplash.com/photo-1518182170546-076616fd62ce?q=80&w=2000&auto=format&fit=crop", // Reykjavik
+  "https://images.unsplash.com/photo-1583422409516-2895a77efded?q=80&w=2000&auto=format&fit=crop", // Barcelona
+  "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?q=80&w=2000&auto=format&fit=crop", // Rio de Janeiro
+  "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?q=80&w=2000&auto=format&fit=crop", // Cape Town
+  "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?q=80&w=2000&auto=format&fit=crop", // Dubrovnik
+  "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?q=80&w=2000&auto=format&fit=crop"  // Marrakech
+];
+
 export default function Home() {
   const { data: session } = useSession();
+  const [currentBgIndex, setCurrentBgIndex] = useState(0);
   const [hasStarted, setHasStarted] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBgIndex((prev) => (prev + 1) % DESTINATION_IMAGES.length);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
   const [destination, setDestination] = useState("");
   const [days, setDays] = useState(3);
   const [budget, setBudget] = useState("Moderate");
@@ -1138,15 +1169,20 @@ export default function Home() {
 
           {/* ─── FORM CARD ─── */}
           <section className="relative w-full min-h-[60vh] overflow-hidden flex flex-col items-center justify-center pt-24">
-            {/* Layer 1: Animated Waterfall Background */}
-            <div
-              className="absolute inset-0 w-full h-full z-0 animate-[pulse_10s_ease-in-out_infinite]"
-              style={{
-                backgroundImage: "url('https://images.unsplash.com/photo-1433086966358-54859d0ed716?q=80&w=2000&auto=format&fit=crop')",
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
-              }}
-            />
+            {/* Layer 1: Animated Waterfall Background / Destination Slideshow */}
+            {DESTINATION_IMAGES.map((img, index) => (
+              <div
+                key={img}
+                className={`absolute inset-0 w-full h-full z-0 transition-opacity duration-700 ease-in-out ${
+                  index === currentBgIndex ? 'opacity-100 scale-105' : 'opacity-0 scale-100'
+                }`}
+                style={{
+                  backgroundImage: `url('${img}')`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
+                }}
+              />
+            ))}
 
             {/* Layer 2: Dark gradient overlay */}
             <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/40 via-black/60 to-[#0f172a]" />
