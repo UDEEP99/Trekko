@@ -12,6 +12,8 @@ interface SavedTrip {
   days: number;
   budget: string;
   vibe: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  itinerary: any[];
   savedAt: number;
 }
 

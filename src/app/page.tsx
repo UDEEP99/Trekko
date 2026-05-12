@@ -25,7 +25,6 @@ import {
   Map,
   ExternalLink,
   Navigation,
-  Clock,
   Trash2,
   ImageIcon,
   Search,
@@ -40,7 +39,6 @@ import {
   Share2,
   Check,
   Link2,
-  Copy,
   Plus,
 } from "lucide-react";
 import ThemeToggle from "./components/ThemeToggle";
@@ -143,6 +141,7 @@ function FloatingDecor() {
     </div>
   );
 }
+
 
 /* ─── Quick Booking Buttons ─── */
 function QuickBookings({ destination }: { destination: string }) {
@@ -406,8 +405,10 @@ function ActivityCard({
 
 /* ─── Add Activity Form ─── */
 function AddActivityForm({
-  day,
-  destination,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  day: _day,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  destination: _destination,
   onAdd,
   onCancel,
 }: {
@@ -724,6 +725,7 @@ export default function Home() {
   const [isSaved, setIsSaved] = useState(false);
   const [addingActivityDay, setAddingActivityDay] = useState<number | null>(null);
   const [activeDayIndex, setActiveDayIndex] = useState(0);
+
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const moodBoardImages = useMemo(() => {
@@ -1060,7 +1062,7 @@ export default function Home() {
           <FloatingDecor />
 
           {/* ─── NAVBAR ─── */}
-          <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/70 dark:bg-slate-900/80 border-b border-gray-200 dark:border-slate-800">
+          <nav className="fixed top-0 w-full z-50 bg-black/40 backdrop-blur-md border-b border-white/10">
             <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
@@ -1070,18 +1072,32 @@ export default function Home() {
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-500 to-cyan-500 flex items-center justify-center shadow-md">
                   <Plane className="w-4.5 h-4.5 text-white" />
                 </div>
-                <span className="text-xl font-bold text-gradient tracking-tight">Trekko</span>
+                <span className="text-xl font-extrabold text-gradient tracking-tight">
+                  Trekko
+                </span>
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="flex items-center gap-4"
+                className="flex items-center gap-2"
               >
-                <div className="hidden sm:flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
-                  <Globe className="w-3.5 h-3.5" />
-                  <span>AI-Powered Travel</span>
-                </div>
+                {/* ─── Save Itinerary Button ─── */}
+                {itinerary && (
+                  <div className="tooltip-wrapper" data-tooltip="Save Current Plan for Later">
+                    <button
+                      onClick={isSaved ? removeSavedPlan : savePlan}
+                      className="nav-action-btn"
+                    >
+                      {isSaved ? <Check className="w-3.5 h-3.5" /> : <Bookmark className="w-3.5 h-3.5" />}
+                      <span className="hidden sm:inline">{isSaved ? "Saved" : "Save Itinerary"}</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* ─── Theme Toggle ─── */}
                 <ThemeToggle />
+
+                {/* ─── History + Saved Plans (from Header) ─── */}
                 <Header
                   recentTrips={recentTrips}
                   savedPlans={savedPlans}
@@ -1093,7 +1109,7 @@ export default function Home() {
           </nav>
 
           {/* ─── HERO ─── */}
-          <section className="pt-16 pb-8 px-6">
+          <section className="pt-24 pb-8 px-6">
             <div className="max-w-3xl mx-auto text-center">
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -1121,84 +1137,101 @@ export default function Home() {
           </section>
 
           {/* ─── FORM CARD ─── */}
-          <section className="px-6 pb-16">
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
-              className="max-w-2xl mx-auto"
-            >
-              <form
-                onSubmit={handleSubmit}
-                className="glass-strong rounded-2xl p-6 sm:p-8 shadow-glass hover:shadow-glass-lg transition-shadow duration-500"
+          <section className="relative w-full min-h-[60vh] overflow-hidden flex flex-col items-center justify-center pt-24">
+            {/* Layer 1: Animated Waterfall Background */}
+            <div
+              className="absolute inset-0 w-full h-full z-0 animate-[pulse_10s_ease-in-out_infinite]"
+              style={{
+                backgroundImage: "url('https://images.unsplash.com/photo-1433086966358-54859d0ed716?q=80&w=2000&auto=format&fit=crop')",
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
+            />
+
+            {/* Layer 2: Dark gradient overlay */}
+            <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/40 via-black/60 to-[#0f172a]" />
+
+            {/* Layer 3: The Search Content */}
+            <div className="relative z-20 w-full max-w-4xl px-4 pb-16">
+              <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
+                className="max-w-2xl mx-auto"
               >
-                {/* ─── Destination Banner Image ─── */}
-                <AnimatePresence>
-                  {(selectedDestinationImage || bannerLoading) && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                      animate={{ opacity: 1, height: "auto", marginBottom: 20 }}
-                      exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                      transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-                      className="overflow-hidden rounded-2xl relative"
-                    >
+                <form
+                  onSubmit={handleSubmit}
+                  className="glass-strong rounded-2xl p-6 sm:p-8 shadow-glass hover:shadow-glass-lg transition-shadow duration-500"
+                >
+                  {/* ─── Destination Banner Image ─── */}
+                  <AnimatePresence>
+                    {(selectedDestinationImage || bannerLoading) && (
                       <motion.div
-                        initial={{ scale: 1.1 }}
-                        animate={{ scale: 1 }}
-                        transition={{ duration: 0.7, ease: "easeOut" }}
-                        className="relative w-full h-48 sm:h-56 rounded-2xl overflow-hidden"
+                        initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                        animate={{ opacity: 1, height: "auto", marginBottom: 20 }}
+                        exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                        transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        className="overflow-hidden rounded-2xl relative"
                       >
-                        {/* Banner image with error boundary — shows gradient fallback on failure */}
-                        {bannerLoading ? (
-                          <div className="w-full h-full bg-shimmer animate-shimmer rounded-2xl" />
-                        ) : !bannerImageError && selectedDestinationImage ? (
-                          <>  {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={selectedDestinationImage}
-                              alt={`${destination} destination`}
-                              className="w-full h-full object-cover rounded-lg"
-                              onError={() => setBannerImageError(true)}
-                            />
-                          </>
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-orange-400 via-amber-500 to-cyan-500 flex items-center justify-center">
-                            <div className="text-center">
-                              <MapPin className="w-8 h-8 text-white/80 mx-auto mb-2" />
-                              <p className="text-white font-bold text-xl drop-shadow-md">{destination}</p>
-                              <p className="text-white/70 text-sm mt-1">Destination Preview</p>
-                            </div>
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                         <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.3 }}
-                          className="absolute bottom-4 left-4 right-4 flex items-end justify-between"
+                          initial={{ scale: 1.1 }}
+                          animate={{ scale: 1 }}
+                          transition={{ duration: 0.7, ease: "easeOut" }}
+                          className="relative w-full h-48 sm:h-56 rounded-2xl overflow-hidden"
                         >
-                          <div>
-                            <p className="text-white font-bold text-lg drop-shadow-md">{destination}</p>
-                            <p className="text-white/80 text-xs drop-shadow-sm">Your next adventure awaits</p>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => setSelectedDestinationImage(null)}
-                            className="p-1.5 rounded-lg bg-black/30 hover:bg-black/50 text-white/80 hover:text-white transition-all"
+                          {/* Banner image with error boundary — shows gradient fallback on failure */}
+                          {bannerLoading ? (
+                            <div className="w-full h-full bg-shimmer animate-shimmer rounded-2xl" />
+                          ) : !bannerImageError && selectedDestinationImage ? (
+                            <>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={selectedDestinationImage}
+                                alt={`${destination} destination`}
+                                className="w-full h-full object-cover rounded-lg"
+                                onError={() => setBannerImageError(true)}
+                              />
+                            </>
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-orange-400 via-amber-500 to-cyan-500 flex items-center justify-center">
+                              <div className="text-center">
+                                <MapPin className="w-8 h-8 text-white/80 mx-auto mb-2" />
+                                <p className="text-white font-bold text-xl drop-shadow-md">{destination}</p>
+                                <p className="text-white/70 text-sm mt-1">Destination Preview</p>
+                              </div>
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="absolute bottom-4 left-4 right-4 flex items-end justify-between"
                           >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
+                            <div>
+                              <p className="text-white font-bold text-lg drop-shadow-md">{destination}</p>
+                              <p className="text-white/80 text-xs drop-shadow-sm">Your next adventure awaits</p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedDestinationImage(null)}
+                              className="p-1.5 rounded-lg bg-black/30 hover:bg-black/50 text-white/80 hover:text-white transition-all"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </motion.div>
                         </motion.div>
                       </motion.div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                    )}
+                  </AnimatePresence>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  {/* Destination — Animated Search + Autocomplete */}
-                  <div className="sm:col-span-2 relative group" ref={suggestionsRef}>
-                    <label htmlFor="destination" className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1.5">
-                      Where to?
-                    </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    {/* Destination — Animated Search + Autocomplete */}
+                    <div className="sm:col-span-2 relative group" ref={suggestionsRef}>
+
+                      <label htmlFor="destination" className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1.5">
+                        Where to?
+                      </label>
                     <motion.div
                       className="relative"
                       animate={{
@@ -1355,6 +1388,7 @@ export default function Home() {
 
             {/* ─── FLIGHT SEARCH ─── */}
             <FlightSearch />
+          </div>
           </section>
 
 

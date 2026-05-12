@@ -75,6 +75,7 @@ const config: Config = {
         "drift-left": "driftLeft 18s linear infinite",
         "pulse-glow": "pulseGlow 4s ease-in-out infinite",
         "sway": "sway 5s ease-in-out infinite",
+        "pulse-zoom": "pulseZoom 20s ease-in-out infinite",
       },
       keyframes: {
         fadeIn: {
@@ -110,6 +111,10 @@ const config: Config = {
         sway: {
           "0%, 100%": { transform: "rotate(-3deg)" },
           "50%": { transform: "rotate(3deg)" },
+        },
+        pulseZoom: {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.05)" },
         },
       },
       backdropBlur: {
