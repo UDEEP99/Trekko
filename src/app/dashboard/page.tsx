@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import type { Variants } from "framer-motion";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import { useSession, signIn } from "next-auth/react";
 import {
     Plane,
@@ -1073,14 +1074,15 @@ export default function Home() {
                             <motion.div
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                className="flex items-center gap-2.5"
                             >
-                                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-500 to-cyan-500 flex items-center justify-center shadow-md">
-                                    <Plane className="w-4.5 h-4.5 text-white" />
-                                </div>
-                                <span className="text-xl font-extrabold text-gradient tracking-tight font-serif">
-                                    Trekko
-                                </span>
+                                <Link href="/" className="flex items-center gap-2.5 cursor-pointer">
+                                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-500 to-cyan-500 flex items-center justify-center shadow-md">
+                                        <Plane className="w-4.5 h-4.5 text-white" />
+                                    </div>
+                                    <span className="text-xl font-extrabold text-gradient tracking-tight font-serif">
+                                        Trekko
+                                    </span>
+                                </Link>
                             </motion.div>
                             <motion.div
                                 initial={{ opacity: 0, x: 20 }}
@@ -1111,32 +1113,7 @@ export default function Home() {
                         </div>
                     </nav>
 
-                    <section className="pt-24 pb-8 px-6">
-                        <div className="max-w-3xl mx-auto text-center">
-                            <motion.div
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.7, ease: "easeOut" }}
-                            >
-                                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-50 dark:bg-orange-900/30 border border-orange-200/60 dark:border-orange-700/50 text-orange-700 dark:text-orange-300 text-sm font-medium mb-6">
-                                    <Sparkles className="w-3.5 h-3.5" />
-                                    Powered by AI
-                                </div>
-                                <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight font-serif">
-                                    Plan your dream trip{" "}
-                                    <span className="text-gradient font-serif">in seconds.</span>
-                                </h1>
-                            </motion.div>
-                            <motion.p
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.7, delay: 0.15, ease: "easeOut" }}
-                                className="mt-5 text-lg text-slate-500 dark:text-slate-400 max-w-xl mx-auto leading-relaxed"
-                            >
-                                Trekko AI builds personalized, day-by-day itineraries tailored to your budget and travel style.
-                            </motion.p>
-                        </div>
-                    </section>
+
 
                     <section className="relative w-full min-h-[60vh] overflow-hidden flex flex-col items-center justify-center pt-24">
                         <AnimatePresence>
