@@ -8,6 +8,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSession, signIn } from "next-auth/react";
 import {
+    upsertUserProfile,
+    getSavedTrips,
+    saveTrip as cloudantSaveTrip,
+    deleteTrip as cloudantDeleteTrip,
+} from "@/lib/cloudant";
+import {
     Plane,
     MapPin,
     Calendar,
@@ -754,6 +760,7 @@ export default function Home() {
     const [toast, setToast] = useState<{ message: string; type: "success" | "info" } | null>(null);
     const [isSaved, setIsSaved] = useState(false);
     const [addingActivityDay, setAddingActivityDay] = useState<number | null>(null);
+    const [cloudantSyncing, setCloudantSyncing] = useState(false);
     const [activeDayIndex, setActiveDayIndex] = useState(0);
 
     const resultsRef = useRef<HTMLDivElement>(null);
@@ -882,18 +889,57 @@ export default function Home() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    // ── Load from localStorage (immediate) then sync from Cloudant ──
     useEffect(() => {
         try {
             const stored = localStorage.getItem(STORAGE_KEY);
             if (stored) setRecentTrips(JSON.parse(stored));
-        } catch {
-        }
+        } catch { /* ignore */ }
         try {
             const stored = localStorage.getItem(SAVED_PLANS_KEY);
             if (stored) setSavedPlans(JSON.parse(stored));
-        } catch {
-        }
+        } catch { /* ignore */ }
     }, []);
+
+    // ── On sign-in: upsert user profile + fetch saved trips from Cloudant ──
+    useEffect(() => {
+        if (!session?.user?.email) return;
+        const email = session.user.email;
+        const name = session.user.name || email;
+
+        // Upsert user profile (fire-and-forget)
+        upsertUserProfile(email, name);
+
+        // Fetch saved trips from Cloudant and merge with localStorage
+        setCloudantSyncing(true);
+        getSavedTrips(email)
+            .then((cloudTrips) => {
+                if (cloudTrips.length === 0) return;
+                // Convert Cloudant docs to SavedTrip shape
+                const mapped: SavedTrip[] = cloudTrips.map((t) => ({
+                    id: `${t.savedAt}`,
+                    destination: t.destination,
+                    days: t.days,
+                    budget: t.budget,
+                    vibe: t.vibe,
+                    itinerary: t.itinerary,
+                    savedAt: t.savedAt,
+                }));
+                setSavedPlans((prev) => {
+                    // Merge: cloud wins for any matching destination
+                    const localOnly = prev.filter(
+                        (p) => !mapped.some((m) => m.destination.toLowerCase() === p.destination.toLowerCase())
+                    );
+                    const merged = [...mapped, ...localOnly].slice(0, MAX_SAVED);
+                    try {
+                        localStorage.setItem(SAVED_PLANS_KEY, JSON.stringify(merged));
+                    } catch { /* ignore */ }
+                    return merged;
+                });
+            })
+            .finally(() => setCloudantSyncing(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [session?.user?.email]);
 
     const saveTrip = useCallback(
         (dest: string, d: number, b: string, v: string, trip: DayPlan[]) => {
@@ -943,43 +989,63 @@ export default function Home() {
         setTimeout(() => setToast(null), 3000);
     }, []);
 
-    const savePlan = useCallback(() => {
+    const savePlan = useCallback(async () => {
         if (!itinerary || !destination.trim()) return;
+        const savedAt = Date.now();
         const newPlan: SavedTrip = {
-            id: `saved-${Date.now()}`,
+            id: `${savedAt}`,
             destination: destination.trim(),
             days,
             budget,
             vibe: travelStyle,
             itinerary,
-            savedAt: Date.now(),
+            savedAt,
         };
+        // 1. Update local state + localStorage immediately
         setSavedPlans((prev) => {
             const updated = [newPlan, ...prev.filter((p) => p.destination.toLowerCase() !== destination.trim().toLowerCase())].slice(0, MAX_SAVED);
-            try {
-                localStorage.setItem(SAVED_PLANS_KEY, JSON.stringify(updated));
-            } catch {
-            }
+            try { localStorage.setItem(SAVED_PLANS_KEY, JSON.stringify(updated)); } catch { /* ignore */ }
             return updated;
         });
         setIsSaved(true);
-        showToast("Plan saved successfully!", "success");
-    }, [itinerary, destination, days, budget, travelStyle, showToast]);
+        showToast("Plan saved!", "success");
 
-    const removeSavedPlan = useCallback(() => {
+        // 2. Persist to Cloudant in background
+        if (session?.user?.email) {
+            setCloudantSyncing(true);
+            await cloudantSaveTrip(session.user.email, {
+                destination: destination.trim(),
+                days,
+                budget,
+                vibe: travelStyle,
+                itinerary,
+                savedAt,
+            }).finally(() => setCloudantSyncing(false));
+        }
+    }, [itinerary, destination, days, budget, travelStyle, showToast, session]);
+
+    const removeSavedPlan = useCallback(async () => {
         if (!destination.trim()) return;
         const destLower = destination.trim().toLowerCase();
+        // Find the plan's savedAt to use as Cloudant doc ID
+        const plan = savedPlans.find((p) => p.destination.toLowerCase() === destLower);
+
+        // 1. Update local state + localStorage immediately
         setSavedPlans((prev) => {
             const updated = prev.filter((p) => p.destination.toLowerCase() !== destLower);
-            try {
-                localStorage.setItem(SAVED_PLANS_KEY, JSON.stringify(updated));
-            } catch {
-            }
+            try { localStorage.setItem(SAVED_PLANS_KEY, JSON.stringify(updated)); } catch { /* ignore */ }
             return updated;
         });
         setIsSaved(false);
         showToast("Plan removed from saved.", "info");
-    }, [destination, showToast]);
+
+        // 2. Delete from Cloudant in background
+        if (session?.user?.email && plan) {
+            setCloudantSyncing(true);
+            await cloudantDeleteTrip(session.user.email, plan.savedAt)
+                .finally(() => setCloudantSyncing(false));
+        }
+    }, [destination, showToast, session, savedPlans]);
 
     useEffect(() => {
         if (!itinerary || !destination.trim()) {
@@ -1034,7 +1100,8 @@ export default function Home() {
         }, 2200);
 
         try {
-            const res = await fetch("http://localhost:5000/api/generate", {
+            const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+            const res = await fetch(`${backendUrl}/api/generate`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ destination, days, budget, vibe: travelStyle }),
@@ -1094,9 +1161,18 @@ export default function Home() {
                                         <button
                                             onClick={isSaved ? removeSavedPlan : savePlan}
                                             className="nav-action-btn"
+                                            disabled={cloudantSyncing}
                                         >
-                                            {isSaved ? <Check className="w-3.5 h-3.5" /> : <Bookmark className="w-3.5 h-3.5" />}
-                                            <span className="hidden sm:inline">{isSaved ? "Saved" : "Save Itinerary"}</span>
+                                            {cloudantSyncing ? (
+                                                <motion.span
+                                                    animate={{ rotate: 360 }}
+                                                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                                    className="w-3.5 h-3.5 border-2 border-orange-400 border-t-transparent rounded-full inline-block"
+                                                />
+                                            ) : isSaved ? <Check className="w-3.5 h-3.5" /> : <Bookmark className="w-3.5 h-3.5" />}
+                                            <span className="hidden sm:inline">
+                                                {cloudantSyncing ? "Syncing…" : isSaved ? "Saved" : "Save Itinerary"}
+                                            </span>
                                         </button>
                                     </div>
                                 )}
