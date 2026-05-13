@@ -40,11 +40,23 @@ import {
   Check,
   Link2,
   Plus,
+  Minus,
+  User,
+  Users,
+  Baby,
+  Backpack,
+  Gem,
+  Landmark,
+  Palmtree,
+  PartyPopper,
 } from "lucide-react";
 import ThemeToggle from "./components/ThemeToggle";
 import Header from "./components/Header";
 import FlightSearch from "./components/FlightSearch";
 import ItinerarySkeleton from "./components/ItinerarySkeleton";
+import { Playfair_Display } from "next/font/google";
+
+const playfair = Playfair_Display({ subsets: ["latin"] });
 
 /* ─── Geocoding Types ─── */
 interface GeoSuggestion {
@@ -232,7 +244,7 @@ function SelectField({
         type="button"
         id={id}
         onClick={() => setIsOpen((prev) => !prev)}
-        className="w-full flex items-center gap-2.5 pl-10 pr-4 py-3 bg-white/60 dark:bg-slate-800/60 border border-orange-100 dark:border-slate-600 rounded-xl text-slate-700 dark:text-slate-200 text-sm text-left focus:outline-none focus:ring-2 focus:ring-orange-300/40 dark:focus:ring-cyan-400/30 focus:border-orange-400 dark:focus:border-cyan-500 transition-all duration-200 hover:border-orange-300 dark:hover:border-slate-500 relative cursor-pointer"
+        className="w-full flex items-center gap-2.5 pl-10 pr-4 py-3 bg-white/60 dark:bg-slate-800/60 border border-orange-100 dark:border-slate-600 rounded-xl text-slate-700 dark:text-slate-200 text-sm text-left focus:outline-none focus:ring-2 focus:ring-orange-300/40 dark:focus:ring-cyan-400/30 focus:border-orange-400 dark:focus:border-cyan-500 transition-all duration-300 animate-glow-pulse hover:border-orange-300 dark:hover:border-slate-500 relative cursor-pointer"
       >
         <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-500 dark:text-cyan-400" />
         <span className="flex-1 truncate font-medium">{value}</span>
@@ -257,11 +269,10 @@ function SelectField({
                     onChange(option);
                     setIsOpen(false);
                   }}
-                  className={`w-full text-left px-4 py-2.5 text-sm transition-colors duration-150 flex items-center gap-2.5 ${
-                    value === option
-                      ? "bg-orange-50 dark:bg-slate-700 text-orange-600 dark:text-orange-400 font-semibold"
-                      : "text-slate-700 dark:text-slate-300 hover:bg-orange-50 dark:hover:bg-slate-700 dark:hover:text-orange-400"
-                  }`}
+                  className={`w-full text-left px-4 py-2.5 text-sm transition-colors duration-150 flex items-center gap-2.5 ${value === option
+                    ? "bg-orange-50 dark:bg-slate-700 text-orange-600 dark:text-orange-400 font-semibold"
+                    : "text-slate-700 dark:text-slate-300 hover:bg-orange-50 dark:hover:bg-slate-700 dark:hover:text-orange-400"
+                    }`}
                 >
                   {value === option && (
                     <span className="w-1.5 h-1.5 rounded-full bg-orange-500 dark:bg-orange-400 flex-shrink-0" />
@@ -606,12 +617,12 @@ function SplashBanner({ onStart }: { onStart: () => void }) {
         </motion.div>
 
         {/* Main headline — word by word */}
-        <h1 className="splash-headline">
+        <h1 className={`splash-headline ${playfair.className}`}>
           {words.map((word, i) => (
             <motion.span
               key={i}
               variants={splashWordVariants}
-              className={word === "Trekko" ? "splash-headline-accent" : ""}
+              className={word === "Trekko" ? "text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-500 to-teal-400" : ""}
             >
               {word}{" "}
             </motion.span>
@@ -704,27 +715,39 @@ function ImageLightbox({
 }
 
 /* ─── Main Page ─── */
+const DESTINATION_NAMES = [
+  "The Maldives", "Bora Bora, French Polynesia", "Bali, Indonesia", "Goa, India",
+  "Seychelles", "Swiss Alps, Switzerland", "Leh-Ladakh, India", "Banff, Canada",
+  "Queenstown, New Zealand", "Munnar, India", "Paris, France", "Tokyo, Japan",
+  "New York City, USA", "Singapore", "Dubai, UAE", "Santorini, Greece",
+  "Kyoto, Japan", "Rome, Italy", "Jaipur, India", "Marrakech, Morocco"
+];
+
 const DESTINATION_IMAGES = [
-  "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=2000&auto=format&fit=crop", // Paris
-  "https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=2000&auto=format&fit=crop", // Rome
-  "https://images.unsplash.com/photo-1539650116574-8efeb43e2b45?q=80&w=2000&auto=format&fit=crop", // Cairo
-  "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=2000&auto=format&fit=crop", // New York City
-  "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=2000&auto=format&fit=crop", // London
-  "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?q=80&w=2000&auto=format&fit=crop", // Singapore
-  "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=2000&auto=format&fit=crop", // Kyoto
-  "https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=2000&auto=format&fit=crop", // Ha Long Bay
-  "https://images.unsplash.com/photo-1540615801970-1f9e80277256?q=80&w=2000&auto=format&fit=crop", // Siem Reap
+  // Tropical & Beach
+  "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?q=80&w=2000&auto=format&fit=crop", // Maldives
+  "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=2000&auto=format&fit=crop", // Bora Bora
   "https://images.unsplash.com/photo-1537996194471-e657df975ab4?q=80&w=2000&auto=format&fit=crop", // Bali
-  "https://images.unsplash.com/photo-1561134643-66c3a0b5a329?q=80&w=2000&auto=format&fit=crop", // Banff
-  "https://images.unsplash.com/photo-1514282401047-d79a714d24ce?q=80&w=2000&auto=format&fit=crop", // The Maldives
+  "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?q=80&w=2000&auto=format&fit=crop", // Goa
+  "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?q=80&w=2000&auto=format&fit=crop", // Seychelles
+  // Mountains & Nature
   "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?q=80&w=2000&auto=format&fit=crop", // Swiss Alps
-  "https://images.unsplash.com/photo-1582967788606-a171c1080cb0?q=80&w=2000&auto=format&fit=crop", // Great Barrier Reef
-  "https://images.unsplash.com/photo-1518182170546-076616fd62ce?q=80&w=2000&auto=format&fit=crop", // Reykjavik
-  "https://images.unsplash.com/photo-1583422409516-2895a77efded?q=80&w=2000&auto=format&fit=crop", // Barcelona
-  "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?q=80&w=2000&auto=format&fit=crop", // Rio de Janeiro
-  "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?q=80&w=2000&auto=format&fit=crop", // Cape Town
-  "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?q=80&w=2000&auto=format&fit=crop", // Dubrovnik
-  "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?q=80&w=2000&auto=format&fit=crop"  // Marrakech
+  "https://images.unsplash.com/photo-1581793746485-04698e79a4e8?q=80&w=2000&auto=format&fit=crop", // Leh-Ladakh
+  "https://images.unsplash.com/photo-1534008897995-27a23e859048?q=80&w=2000&auto=format&fit=crop", // Banff
+  "https://images.unsplash.com/photo-1589802829985-817e51171b92?q=80&w=2000&auto=format&fit=crop", // Queenstown
+  "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?q=80&w=2000&auto=format&fit=crop", // Munnar
+  // Iconic Cities
+  "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=2000&auto=format&fit=crop", // Paris
+  "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?q=80&w=2000&auto=format&fit=crop", // Tokyo
+  "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=2000&auto=format&fit=crop", // NYC (FIXED)
+  "https://images.unsplash.com/photo-1523731407965-2430cd12f5e4?q=80&w=2000&auto=format&fit=crop", // Singapore
+  "https://images.unsplash.com/photo-1526495124232-a04e1849168c?q=80&w=2000&auto=format&fit=crop", // Dubai (FIXED)
+  // Culture & Heritage
+  "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?q=80&w=2000&auto=format&fit=crop", // Santorini
+  "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=2000&auto=format&fit=crop", // Kyoto
+  "https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=2000&auto=format&fit=crop", // Rome
+  "https://images.unsplash.com/photo-1557690756-627a4e73a5a7?q=80&w=2000&auto=format&fit=crop", // Jaipur
+  "https://images.unsplash.com/photo-1597212618440-806262de4f6b?q=80&w=2000&auto=format&fit=crop"  // Marrakech
 ];
 
 export default function Home() {
@@ -735,13 +758,14 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentBgIndex((prev) => (prev + 1) % DESTINATION_IMAGES.length);
-    }, 1000);
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
   const [destination, setDestination] = useState("");
-  const [days, setDays] = useState(3);
+  const [days, setDays] = useState(5);
+  const [travelers, setTravelers] = useState("Couple");
   const [budget, setBudget] = useState("Moderate");
-  const [vibe, setVibe] = useState("Culture & History");
+  const [travelStyle, setTravelStyle] = useState("Culture");
   const [loading, setLoading] = useState(false);
   const [msgIndex, setMsgIndex] = useState(0);
   const [itinerary, setItinerary] = useState<DayPlan[] | null>(null);
@@ -762,8 +786,10 @@ export default function Home() {
   const moodBoardImages = useMemo(() => {
     if (!itinerary) return [];
 
-    const imageUrls = itinerary
-      .flatMap((dayPlan) => dayPlan.activities.map((activity) => activity.imageUrl))
+    const imageUrls = (itinerary || [])
+      .flatMap((dayPlan) =>
+        (dayPlan?.activities || []).map((activity) => activity?.imageUrl)
+      )
       .filter((url): url is string => Boolean(url));
 
     const uniqueImages = Array.from(new Set(imageUrls));
@@ -807,7 +833,6 @@ export default function Home() {
   /* ─── Autocomplete State ─── */
   const [suggestions, setSuggestions] = useState<GeoSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [searchFocused, setSearchFocused] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
@@ -934,7 +959,7 @@ export default function Home() {
     setDestination(saved.destination);
     setDays(saved.days);
     setBudget(saved.budget);
-    setVibe(saved.vibe);
+    setTravelStyle(saved.vibe || "Culture");
     setItinerary(saved.itinerary);
     setError(null);
     setTimeout(() => {
@@ -966,7 +991,7 @@ export default function Home() {
       destination: destination.trim(),
       days,
       budget,
-      vibe,
+      vibe: travelStyle,
       itinerary,
       savedAt: Date.now(),
     };
@@ -981,7 +1006,7 @@ export default function Home() {
     });
     setIsSaved(true);
     showToast("Plan saved successfully!", "success");
-  }, [itinerary, destination, days, budget, vibe, showToast]);
+  }, [itinerary, destination, days, budget, travelStyle, showToast]);
 
   /* ─── Remove plan from Saved Plans (unsave toggle) ─── */
   const removeSavedPlan = useCallback(() => {
@@ -1059,13 +1084,13 @@ export default function Home() {
       const res = await fetch("http://localhost:5000/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ destination, days, budget, vibe }),
+        body: JSON.stringify({ destination, days, budget, vibe: travelStyle }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Something went wrong");
       setItinerary(data.trip);
       setIsSaved(false);
-      saveTrip(destination.trim(), days, budget, vibe, data.trip);
+      saveTrip(destination.trim(), days, budget, travelStyle, data.trip);
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 300);
@@ -1103,7 +1128,7 @@ export default function Home() {
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-500 to-cyan-500 flex items-center justify-center shadow-md">
                   <Plane className="w-4.5 h-4.5 text-white" />
                 </div>
-                <span className="text-xl font-extrabold text-gradient tracking-tight">
+                <span className="text-xl font-extrabold text-gradient tracking-tight font-serif">
                   Trekko
                 </span>
               </motion.div>
@@ -1151,9 +1176,9 @@ export default function Home() {
                   <Sparkles className="w-3.5 h-3.5" />
                   Powered by AI
                 </div>
-                <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight font-serif">
                   Plan your dream trip{" "}
-                  <span className="text-gradient">in seconds.</span>
+                  <span className="text-gradient font-serif">in seconds.</span>
                 </h1>
               </motion.div>
               <motion.p
@@ -1170,19 +1195,29 @@ export default function Home() {
           {/* ─── FORM CARD ─── */}
           <section className="relative w-full min-h-[60vh] overflow-hidden flex flex-col items-center justify-center pt-24">
             {/* Layer 1: Animated Waterfall Background / Destination Slideshow */}
-            {DESTINATION_IMAGES.map((img, index) => (
-              <div
-                key={img}
-                className={`absolute inset-0 w-full h-full z-0 transition-opacity duration-700 ease-in-out ${
-                  index === currentBgIndex ? 'opacity-100 scale-105' : 'opacity-0 scale-100'
-                }`}
+            <AnimatePresence>
+              <motion.div
+                key={currentBgIndex}
+                initial={{ opacity: 0, x: 100 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -100 }}
+                transition={{ duration: 1.5, ease: "easeInOut" }}
+                className="absolute inset-0 w-full h-full z-0"
                 style={{
-                  backgroundImage: `url('${img}')`,
+                  backgroundImage: `url('${DESTINATION_IMAGES[currentBgIndex]}')`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center'
                 }}
               />
-            ))}
+            </AnimatePresence>
+
+            {/* Bottom-Right Widget */}
+            <div className="absolute bottom-6 right-6 z-20 bg-black/50 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-cyan-400" />
+              <span className="text-white/90 text-sm font-medium tracking-wide drop-shadow-md capitalize truncate max-w-[200px]">
+                {DESTINATION_NAMES[currentBgIndex] || 'Beautiful Destination'}
+              </span>
+            </div>
 
             {/* Layer 2: Dark gradient overlay */}
             <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/40 via-black/60 to-[#0f172a]" />
@@ -1197,7 +1232,7 @@ export default function Home() {
               >
                 <form
                   onSubmit={handleSubmit}
-                  className="glass-strong rounded-2xl p-6 sm:p-8 shadow-glass hover:shadow-glass-lg transition-shadow duration-500"
+                  className="w-full max-w-3xl bg-[#FFFBF2]/90 dark:bg-[#1e2330]/80 backdrop-blur-xl border border-amber-900/10 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-2xl mx-auto transition-colors duration-300"
                 >
                   {/* ─── Destination Banner Image ─── */}
                   <AnimatePresence>
@@ -1215,7 +1250,6 @@ export default function Home() {
                           transition={{ duration: 0.7, ease: "easeOut" }}
                           className="relative w-full h-48 sm:h-56 rounded-2xl overflow-hidden"
                         >
-                          {/* Banner image with error boundary — shows gradient fallback on failure */}
                           {bannerLoading ? (
                             <div className="w-full h-full bg-shimmer animate-shimmer rounded-2xl" />
                           ) : !bannerImageError && selectedDestinationImage ? (
@@ -1261,170 +1295,213 @@ export default function Home() {
                     )}
                   </AnimatePresence>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    {/* Destination — Animated Search + Autocomplete */}
-                    <div className="sm:col-span-2 relative group" ref={suggestionsRef}>
-
-                      <label htmlFor="destination" className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1.5">
-                        Where to?
-                      </label>
-                    <motion.div
-                      className="relative"
-                      animate={{
-                        scale: searchFocused ? 1.02 : 1,
-                      }}
-                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                    >
-                      <div
-                        className={`absolute -inset-0.5 rounded-xl transition-all duration-300 pointer-events-none ${searchFocused
-                          ? "bg-gradient-to-r from-orange-400/30 via-amber-300/20 to-cyan-400/30 dark:from-orange-500/20 dark:via-amber-400/15 dark:to-cyan-500/20 blur-sm opacity-100"
-                          : "opacity-0"
-                          }`}
-                      />
-                      <div className="relative">
-                        <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-200 ${searchFocused ? "text-orange-600 dark:text-cyan-300" : "text-orange-500 dark:text-cyan-400"}`} />
+                  {/* Row 1: Destination Only */}
+                  <div className="mb-6">
+                    <label className="text-sm text-gray-600 dark:text-gray-400 font-medium px-1 mb-2 block transition-colors duration-300">Where to?</label>
+                    <div ref={suggestionsRef} className="relative w-full">
+                      <div className="relative flex items-center w-full bg-gray-50 dark:bg-[#151923] border border-gray-200 dark:border-white/10 rounded-xl overflow-hidden group hover:border-teal-500/50 dark:hover:border-teal-400/50 transition-all duration-300 focus-within:ring-1 focus-within:ring-teal-500/50 dark:focus-within:ring-teal-400/50 animate-glow-pulse">
+                        <div className="absolute left-4 flex items-center pointer-events-none">
+                          <MapPin className="w-5 h-5 text-teal-600 dark:text-teal-500" />
+                        </div>
                         <input
-                          id="destination"
                           type="text"
-                          placeholder="Search Paris, Tokyo, Bali…"
+                          placeholder="Search Paris, Tokyo, Bali..."
                           value={destination}
                           onChange={(e) => {
                             setDestination(e.target.value);
                             fetchSuggestions(e.target.value);
                           }}
                           onFocus={() => {
-                            setSearchFocused(true);
                             if (suggestions.length > 0) setShowSuggestions(true);
                           }}
-                          onBlur={() => setSearchFocused(false)}
                           autoComplete="off"
                           required
-                          className={`w-full pl-10 pr-4 py-3 bg-white/60 dark:bg-slate-800/60 border rounded-xl text-slate-700 dark:text-slate-200 text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none transition-all duration-200 ${searchFocused
-                            ? "border-orange-400 dark:border-cyan-500 ring-2 ring-orange-300/40 dark:ring-cyan-400/30 shadow-lg shadow-orange-200/20 dark:shadow-cyan-500/10"
-                            : "border-orange-100 dark:border-slate-600 hover:border-orange-300 dark:hover:border-slate-500"
-                            }`}
+                          className="w-full bg-transparent text-gray-900 dark:text-white font-medium py-3 pl-12 pr-4 focus:outline-none placeholder-gray-400 dark:placeholder-gray-500"
                         />
                       </div>
-                    </motion.div>
-
-                    {/* Suggestions Dropdown */}
-                    <AnimatePresence>
-                      {showSuggestions && suggestions.length > 0 && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -8, scaleY: 0.95 }}
-                          animate={{ opacity: 1, y: 0, scaleY: 1 }}
-                          exit={{ opacity: 0, y: -8, scaleY: 0.95 }}
-                          transition={{ duration: 0.2, ease: "easeOut" }}
-                          style={{ transformOrigin: "top" }}
-                          className="absolute z-50 left-0 right-0 mt-2 rounded-xl overflow-hidden glass-strong shadow-glass-lg border border-orange-100/60 dark:border-slate-600/60"
-                        >
-                          {suggestions.map((s, i) => (
-                            <motion.button
-                              key={s.id}
-                              type="button"
-                              initial={{ opacity: 0, x: -10 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: i * 0.04 }}
-                              onClick={() => handleSelectSuggestion(s)}
-                              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-orange-50/80 dark:hover:bg-slate-700/60 transition-colors duration-150 border-b border-orange-50 dark:border-slate-700/50 last:border-b-0"
-                            >
-                              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-100 to-amber-50 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center flex-shrink-0">
-                                <MapPin className="w-3.5 h-3.5 text-orange-500 dark:text-cyan-400" />
-                              </div>
-                              <div className="min-w-0">
-                                <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{s.name}</p>
-                                <p className="text-xs text-slate-400 dark:text-slate-500 truncate">
-                                  {s.admin1 ? `${s.admin1}, ` : ""}{s.country}
-                                </p>
-                              </div>
-                            </motion.button>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-
-                  {/* Days */}
-                  <div className="relative group">
-                    <label htmlFor="days" className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1.5">
-                      Number of Days
-                    </label>
-                    <div className="relative">
-                      <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-500 dark:text-cyan-400" />
-                      <input
-                        id="days"
-                        type="number"
-                        min={1}
-                        max={14}
-                        value={days}
-                        onChange={(e) => setDays(Number(e.target.value))}
-                        className="w-full pl-10 pr-4 py-3 bg-white/60 dark:bg-slate-800/60 border border-orange-100 dark:border-slate-600 rounded-xl text-slate-700 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300/40 dark:focus:ring-cyan-400/30 focus:border-orange-400 dark:focus:border-cyan-500 transition-all duration-200 hover:border-orange-300 dark:hover:border-slate-500"
-                      />
+                      <AnimatePresence>
+                        {showSuggestions && suggestions.length > 0 && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -8, scaleY: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scaleY: 1 }}
+                            exit={{ opacity: 0, y: -8, scaleY: 0.95 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                            style={{ transformOrigin: "top" }}
+                            className="absolute z-50 left-0 right-0 top-[calc(100%+8px)] rounded-xl overflow-hidden bg-[#1e2330] shadow-2xl border border-white/10"
+                          >
+                            {suggestions.map((s) => (
+                              <button
+                                key={s.id}
+                                type="button"
+                                onClick={() => handleSelectSuggestion(s)}
+                                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/5 transition-colors duration-150 border-b border-white/5 last:border-b-0"
+                              >
+                                <div className="w-8 h-8 rounded-lg bg-teal-500/10 flex items-center justify-center flex-shrink-0">
+                                  <MapPin className="w-3.5 h-3.5 text-teal-400" />
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="text-sm font-semibold text-white truncate">{s.name}</p>
+                                  <p className="text-xs text-gray-400 truncate">
+                                    {s.admin1 ? `${s.admin1}, ` : ""}{s.country}
+                                  </p>
+                                </div>
+                              </button>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                   </div>
 
-                  {/* Budget */}
-                  <SelectField
-                    id="budget"
-                    icon={Wallet}
-                    label="Budget"
-                    value={budget}
-                    onChange={setBudget}
-                    options={["Backpacker", "Moderate", "Luxury"]}
-                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                  {/* Vibe */}
-                  <div className="sm:col-span-2">
-                    <SelectField
-                      id="vibe"
-                      icon={Compass}
-                      label="Travel Style"
-                      value={vibe}
-                      onChange={setVibe}
-                      options={["Romantic for Couples", "Chill & Relax", "Adventure", "Culture & History", "Party"]}
-                    />
-                  </div>
-                </div>
-
-                {/* Submit — auth-gated */}
-                {session ? (
-                  <motion.button
-                    type="submit"
-                    disabled={loading || !destination.trim()}
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="mt-6 w-full py-3.5 rounded-xl bg-gradient-to-r from-orange-500 via-amber-500 to-cyan-500 text-white font-semibold text-sm shadow-lg shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    {loading ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        Generating…
+                    {/* Number of Days */}
+                    <div className="flex flex-col gap-2 w-full">
+                      <label className="text-sm text-stone-600 dark:text-gray-400 font-medium px-1 mb-2 block transition-colors duration-300">Number of Days</label>
+                      <div className="relative flex items-center w-full bg-white dark:bg-[#151923] border border-amber-900/10 dark:border-white/10 rounded-xl overflow-hidden group hover:border-teal-500/50 dark:hover:border-teal-400/50 transition-all duration-300 focus-within:ring-1 focus-within:ring-teal-500/50 dark:focus-within:ring-teal-400/50 animate-glow-pulse shadow-sm">
+                        <div className="absolute left-4 flex items-center pointer-events-none">
+                          <Calendar className="w-5 h-5 text-teal-500" />
+                        </div>
+                        <input
+                          type="number"
+                          min="1"
+                          max="30"
+                          value={days}
+                          onChange={(e) => setDays(Math.max(1, parseInt(e.target.value) || 1))}
+                          className="w-full bg-transparent text-stone-800 dark:text-white font-medium text-lg py-3 pl-12 pr-24 focus:outline-none appearance-none"
+                        />
+                        <div className="absolute right-2 flex items-center gap-1 bg-[#2a303f] p-1 rounded-lg border border-white/5 shadow-inner">
+                          <button
+                            onClick={() => setDays(prev => Math.max(1, prev - 1))}
+                            className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-md transition-colors"
+                            type="button"
+                          >
+                            <Minus className="w-4 h-4" />
+                          </button>
+                          <div className="w-[1px] h-4 bg-white/10 mx-1"></div>
+                          <button
+                            onClick={() => setDays(prev => prev + 1)}
+                            className="p-1.5 text-gray-400 hover:text-teal-400 hover:bg-white/10 rounded-md transition-colors"
+                            type="button"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
-                    ) : (
-                      <>
-                        <Sparkles className="w-4 h-4" />
-                        Generate Itinerary
-                      </>
-                    )}
-                  </motion.button>
-                ) : (
-                  <motion.button
-                    type="button"
-                    onClick={() => signIn("appid")}
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="mt-6 w-full py-3.5 rounded-xl bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 text-white font-semibold text-sm shadow-lg shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/30 transition-all duration-300 flex items-center justify-center gap-2"
-                  >
-                    <LogIn className="w-4 h-4" />
-                    Login to Generate Itinerary
-                  </motion.button>
-                )}
-              </form>
-            </motion.div>
+                    </div>
 
-            {/* ─── FLIGHT SEARCH ─── */}
-            <FlightSearch />
-          </div>
+                    {/* Row 2: Travelers & Budget */}
+                    <div className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+
+                      {/* Travelers Selector */}
+                      <div>
+                        <label className="text-sm text-stone-600 dark:text-gray-400 font-medium px-1 mb-2 block transition-colors duration-300">Who is traveling?</label>
+                        <div className="grid grid-cols-3 gap-3">
+                          {[{ id: 'Solo', icon: User }, { id: 'Couple', icon: Users }, { id: 'Family', icon: Baby }].map((item) => (
+                            <div
+                              key={item.id}
+                              onClick={() => setTravelers(item.id)}
+                              className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border cursor-pointer transition-all duration-300 
+                                ${travelers === item.id
+                                  ? 'border-teal-500 bg-teal-50 text-teal-700 shadow-[0_0_15px_rgba(20,184,166,0.15)] dark:border-teal-400 dark:bg-teal-400/10 dark:text-teal-400 dark:shadow-[0_0_15px_rgba(45,212,191,0.15)]'
+                                  : 'bg-white border-amber-900/10 text-stone-500 hover:border-amber-900/20 hover:text-stone-800 shadow-sm dark:bg-[#151923] dark:border-white/10 dark:text-gray-400 dark:hover:border-white/30 dark:hover:text-gray-200'
+                                }`}
+                            >
+                              <item.icon className="w-5 h-5" />
+                              <span className="text-xs font-semibold">{item.id}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Budget Selector */}
+                      <div>
+                        <label className="text-sm text-stone-600 dark:text-gray-400 font-medium px-1 mb-2 block transition-colors duration-300">Budget</label>
+                        <div className="grid grid-cols-3 gap-3">
+                          {[{ id: 'Backpacker', icon: Backpack }, { id: 'Moderate', icon: Wallet }, { id: 'Luxury', icon: Gem }].map((item) => (
+                            <div
+                              key={item.id}
+                              onClick={() => setBudget(item.id)}
+                              className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border cursor-pointer transition-all duration-300 
+                                ${budget === item.id
+                                  ? 'border-teal-500 bg-teal-50 text-teal-700 shadow-[0_0_15px_rgba(20,184,166,0.15)] dark:border-teal-400 dark:bg-teal-400/10 dark:text-teal-400 dark:shadow-[0_0_15px_rgba(45,212,191,0.15)]'
+                                  : 'bg-white border-amber-900/10 text-stone-500 hover:border-amber-900/20 hover:text-stone-800 shadow-sm dark:bg-[#151923] dark:border-white/10 dark:text-gray-400 dark:hover:border-white/30 dark:hover:text-gray-200'
+                                }`}
+                            >
+                              <item.icon className="w-5 h-5" />
+                              <span className="text-xs font-semibold">{item.id}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Row 3: Travel Style */}
+                    <div className="col-span-1 md:col-span-2 mt-4">
+                      <label className="text-sm text-stone-600 dark:text-gray-400 font-medium px-1 mb-2 block transition-colors duration-300">Travel Style</label>
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                        {[
+                          { id: 'Culture', icon: Landmark, label: 'Culture' },
+                          { id: 'Relax', icon: Palmtree, label: 'Relax' },
+                          { id: 'Adventure', icon: Mountain, label: 'Adventure' },
+                          { id: 'Romantic', icon: Heart, label: 'Romantic' },
+                          { id: 'Party', icon: PartyPopper, label: 'Party' }
+                        ].map((item) => (
+                          <div
+                            key={item.id}
+                            onClick={() => setTravelStyle(item.id)}
+                            className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border cursor-pointer transition-all duration-300 
+                              ${travelStyle === item.id
+                                ? 'border-teal-500 bg-teal-50 text-teal-700 shadow-[0_0_15px_rgba(20,184,166,0.15)] dark:border-teal-400 dark:bg-teal-400/10 dark:text-teal-400 dark:shadow-[0_0_15px_rgba(45,212,191,0.15)]'
+                                : 'bg-white border-amber-900/10 text-stone-500 hover:border-amber-900/20 hover:text-stone-800 shadow-sm dark:bg-[#151923] dark:border-white/10 dark:text-gray-400 dark:hover:border-white/30 dark:hover:text-gray-200'
+                              }`}
+                          >
+                            <item.icon className="w-5 h-5" />
+                            <span className="text-xs font-semibold">{item.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Generate Button */}
+                    <div className="col-span-1 md:col-span-2 mt-2">
+                      {session ? (
+                        <button
+                          type="submit"
+                          disabled={loading || !destination.trim()}
+                          className="w-full py-4 rounded-xl bg-gradient-to-r from-[#b37233] to-[#1e7875] text-white font-bold text-lg hover:opacity-90 hover:shadow-[0_0_20px_rgba(30,120,117,0.4)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        >
+                          {loading ? (
+                            <div className="flex items-center gap-2">
+                              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                              Generating…
+                            </div>
+                          ) : (
+                            <>
+                              <Sparkles className="w-5 h-5" />
+                              Generate Itinerary
+                            </>
+                          )}
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => signIn("appid")}
+                          className="w-full py-4 rounded-xl bg-gradient-to-r from-[#b37233] to-[#1e7875] text-white font-bold text-lg hover:opacity-90 hover:shadow-[0_0_20px_rgba(30,120,117,0.4)] transition-all duration-300 flex items-center justify-center gap-2"
+                        >
+                          <LogIn className="w-5 h-5" />
+                          Login to Generate Itinerary
+                        </button>
+                      )}
+                    </div>
+
+                  </div>
+                </form>
+              </motion.div>
+
+              {/* ─── FLIGHT SEARCH ─── */}
+              <FlightSearch />
+            </div>
           </section>
 
 
@@ -1504,7 +1581,7 @@ export default function Home() {
                       <span className="text-gradient">{destination}</span>
                     </h2>
                     <p className="mt-2 text-slate-500 dark:text-slate-400">
-                      {itinerary.length} days · {budget} · {vibe}
+                      {itinerary.length} days · {budget} · {travelStyle}
                     </p>
                   </motion.div>
 
@@ -1600,11 +1677,10 @@ export default function Home() {
                             key={dayPlan.day}
                             type="button"
                             onClick={() => setActiveDayIndex(index)}
-                            className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap border transition-all duration-200 ${
-                              isActive
-                                ? "bg-orange-500 border-orange-500 text-white dark:bg-cyan-500 dark:border-cyan-500 dark:text-slate-900 shadow-md shadow-orange-500/25 dark:shadow-cyan-500/25"
-                                : "bg-slate-800/90 border-slate-700 text-slate-400 hover:text-slate-200 hover:border-slate-500"
-                            }`}
+                            className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap border transition-all duration-200 ${isActive
+                              ? "bg-orange-500 border-orange-500 text-white dark:bg-cyan-500 dark:border-cyan-500 dark:text-slate-900 shadow-md shadow-orange-500/25 dark:shadow-cyan-500/25"
+                              : "bg-slate-800/90 border-slate-700 text-slate-400 hover:text-slate-200 hover:border-slate-500"
+                              }`}
                           >
                             Day {dayPlan.day}
                           </button>

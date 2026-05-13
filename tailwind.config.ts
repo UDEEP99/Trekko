@@ -61,7 +61,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        sans: ["var(--font-inter)", "sans-serif"],
+        serif: ["var(--font-playfair)", "serif"],
       },
       animation: {
         "fade-in": "fadeIn 0.6s ease-out forwards",
@@ -76,6 +77,7 @@ const config: Config = {
         "pulse-glow": "pulseGlow 4s ease-in-out infinite",
         "sway": "sway 5s ease-in-out infinite",
         "pulse-zoom": "pulseZoom 20s ease-in-out infinite",
+        "glow-pulse": "glowPulse 3s ease-in-out infinite",
       },
       keyframes: {
         fadeIn: {
@@ -115,6 +117,16 @@ const config: Config = {
         pulseZoom: {
           "0%, 100%": { transform: "scale(1)" },
           "50%": { transform: "scale(1.05)" },
+        },
+        glowPulse: {
+          '0%, 100%': { 
+            boxShadow: '0 0 10px 1px rgba(45, 212, 191, 0.1)',
+            borderColor: 'rgba(255, 255, 255, 0.1)'
+          },
+          '50%': { 
+            boxShadow: '0 0 20px 3px rgba(45, 212, 191, 0.4)',
+            borderColor: 'rgba(45, 212, 191, 0.5)' 
+          },
         },
       },
       backdropBlur: {
