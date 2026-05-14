@@ -1276,7 +1276,7 @@ export default function Home() {
                             >
                                 <form
                                     onSubmit={handleSubmit}
-                                    className="w-full max-w-3xl bg-[#FFFBF2]/90 dark:bg-[#1e2330]/80 backdrop-blur-xl border border-amber-900/10 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-2xl mx-auto transition-colors duration-300"
+                                    className="w-full max-w-3xl bg-[#FFFBF2]/40 dark:bg-[#1e2330]/80 backdrop-blur-2xl border border-amber-900/10 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-2xl mx-auto transition-colors duration-300"
                                 >
                                     <AnimatePresence>
                                         {(selectedDestinationImage || bannerLoading) && (
@@ -1340,7 +1340,7 @@ export default function Home() {
                                     <div className="mb-6">
                                         <label className="text-sm text-gray-600 dark:text-gray-400 font-medium px-1 mb-2 block transition-colors duration-300">Where to?</label>
                                         <div ref={suggestionsRef} className="relative w-full">
-                                            <div className="relative flex items-center w-full bg-gray-50 dark:bg-[#151923] border border-gray-200 dark:border-white/10 rounded-xl overflow-hidden group hover:border-teal-500/50 dark:hover:border-teal-400/50 transition-all duration-300 focus-within:ring-1 focus-within:ring-teal-500/50 dark:focus-within:ring-teal-400/50 animate-glow-pulse">
+                                            <div className="relative flex items-center w-full bg-white/40 dark:bg-[#151923] border border-gray-200/50 dark:border-white/10 rounded-xl overflow-hidden group hover:border-teal-500/50 dark:hover:border-teal-400/50 transition-all duration-300 focus-within:ring-1 focus-within:ring-teal-500/50 dark:focus-within:ring-teal-400/50 animate-glow-pulse">
                                                 <div className="absolute left-4 flex items-center pointer-events-none">
                                                     <MapPin className="w-5 h-5 text-teal-600 dark:text-teal-500" />
                                                 </div>
@@ -1357,7 +1357,7 @@ export default function Home() {
                                                     }}
                                                     autoComplete="off"
                                                     required
-                                                    className="w-full bg-transparent text-gray-900 dark:text-white font-medium py-3 pl-12 pr-12 focus:outline-none placeholder-gray-400 dark:placeholder-gray-500"
+                                                    className="w-full bg-transparent text-gray-900 dark:text-white font-medium py-3 pl-12 pr-12 focus:outline-none placeholder-gray-500/70 dark:placeholder-gray-500"
                                                 />
                                                 {/* The Voice Search Button */}
                                                 <button
@@ -1366,7 +1366,7 @@ export default function Home() {
                                                     className={`absolute right-2 p-2 rounded-full transition-all duration-300 ${
                                                         isListening 
                                                             ? 'bg-red-500/20 text-red-500 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.4)]' 
-                                                            : 'text-gray-400 hover:text-teal-500 hover:bg-black/5 dark:hover:bg-white/5'
+                                                            : 'text-gray-500 hover:text-teal-600 hover:bg-black/5 dark:hover:bg-white/5'
                                                     }`}
                                                     title="Search by voice"
                                                 >
@@ -1410,9 +1410,9 @@ export default function Home() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="flex flex-col gap-2 w-full">
                                             <label className="text-sm text-stone-600 dark:text-gray-400 font-medium px-1 mb-2 block transition-colors duration-300">Number of Days</label>
-                                            <div className="relative flex items-center w-full bg-white dark:bg-[#151923] border border-amber-900/10 dark:border-white/10 rounded-xl overflow-hidden group hover:border-teal-500/50 dark:hover:border-teal-400/50 transition-all duration-300 focus-within:ring-1 focus-within:ring-teal-500/50 dark:focus-within:ring-teal-400/50 animate-glow-pulse shadow-sm">
+                                            <div className="relative flex items-center w-full bg-white/40 dark:bg-[#151923] border border-amber-900/10 dark:border-white/10 rounded-xl overflow-hidden group hover:border-teal-500/50 dark:hover:border-teal-400/50 transition-all duration-300 focus-within:ring-1 focus-within:ring-teal-500/50 dark:focus-within:ring-teal-400/50 animate-glow-pulse shadow-sm">
                                                 <div className="absolute left-4 flex items-center pointer-events-none">
-                                                    <Calendar className="w-5 h-5 text-teal-500" />
+                                                    <Calendar className="w-5 h-5 text-teal-600" />
                                                 </div>
                                                 <input
                                                     type="number"
@@ -1452,8 +1452,8 @@ export default function Home() {
                                                             onClick={() => setTravelers(item.id)}
                                                             className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border cursor-pointer transition-all duration-300 
                                 ${travelers === item.id
-                                                                    ? 'border-teal-500 bg-teal-50 text-teal-700 shadow-[0_0_15px_rgba(20,184,166,0.15)] dark:border-teal-400 dark:bg-teal-400/10 dark:text-teal-400 dark:shadow-[0_0_15px_rgba(45,212,191,0.15)]'
-                                                                    : 'bg-white border-amber-900/10 text-stone-500 hover:border-amber-900/20 hover:text-stone-800 shadow-sm dark:bg-[#151923] dark:border-white/10 dark:text-gray-400 dark:hover:border-white/30 dark:hover:text-gray-200'
+                                                                    ? 'border-teal-500 bg-teal-50/80 text-teal-700 shadow-[0_0_15px_rgba(20,184,166,0.15)] dark:border-teal-400 dark:bg-teal-400/10 dark:text-teal-400 dark:shadow-[0_0_15px_rgba(45,212,191,0.15)]'
+                                                                    : 'bg-white/40 border-amber-900/10 text-stone-500 hover:border-amber-900/20 hover:text-stone-800 shadow-sm dark:bg-[#151923] dark:border-white/10 dark:text-gray-400 dark:hover:border-white/30 dark:hover:text-gray-200'
                                                                 }`}
                                                         >
                                                             <item.icon className="w-5 h-5" />
@@ -1472,8 +1472,8 @@ export default function Home() {
                                                             onClick={() => setBudget(item.id)}
                                                             className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border cursor-pointer transition-all duration-300 
                                 ${budget === item.id
-                                                                    ? 'border-teal-500 bg-teal-50 text-teal-700 shadow-[0_0_15px_rgba(20,184,166,0.15)] dark:border-teal-400 dark:bg-teal-400/10 dark:text-teal-400 dark:shadow-[0_0_15px_rgba(45,212,191,0.15)]'
-                                                                    : 'bg-white border-amber-900/10 text-stone-500 hover:border-amber-900/20 hover:text-stone-800 shadow-sm dark:bg-[#151923] dark:border-white/10 dark:text-gray-400 dark:hover:border-white/30 dark:hover:text-gray-200'
+                                                                    ? 'border-teal-500 bg-teal-50/80 text-teal-700 shadow-[0_0_15px_rgba(20,184,166,0.15)] dark:border-teal-400 dark:bg-teal-400/10 dark:text-teal-400 dark:shadow-[0_0_15px_rgba(45,212,191,0.15)]'
+                                                                    : 'bg-white/40 border-amber-900/10 text-stone-500 hover:border-amber-900/20 hover:text-stone-800 shadow-sm dark:bg-[#151923] dark:border-white/10 dark:text-gray-400 dark:hover:border-white/30 dark:hover:text-gray-200'
                                                                 }`}
                                                         >
                                                             <item.icon className="w-5 h-5" />
@@ -1499,8 +1499,8 @@ export default function Home() {
                                                         onClick={() => setTravelStyle(item.id)}
                                                         className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border cursor-pointer transition-all duration-300 
                               ${travelStyle === item.id
-                                                                ? 'border-teal-500 bg-teal-50 text-teal-700 shadow-[0_0_15px_rgba(20,184,166,0.15)] dark:border-teal-400 dark:bg-teal-400/10 dark:text-teal-400 dark:shadow-[0_0_15px_rgba(45,212,191,0.15)]'
-                                                                : 'bg-white border-amber-900/10 text-stone-500 hover:border-amber-900/20 hover:text-stone-800 shadow-sm dark:bg-[#151923] dark:border-white/10 dark:text-gray-400 dark:hover:border-white/30 dark:hover:text-gray-200'
+                                                                ? 'border-teal-500 bg-teal-50/80 text-teal-700 shadow-[0_0_15px_rgba(20,184,166,0.15)] dark:border-teal-400 dark:bg-teal-400/10 dark:text-teal-400 dark:shadow-[0_0_15px_rgba(45,212,191,0.15)]'
+                                                                : 'bg-white/40 border-amber-900/10 text-stone-500 hover:border-amber-900/20 hover:text-stone-800 shadow-sm dark:bg-[#151923] dark:border-white/10 dark:text-gray-400 dark:hover:border-white/30 dark:hover:text-gray-200'
                                                             }`}
                                                     >
                                                         <item.icon className="w-5 h-5" />
