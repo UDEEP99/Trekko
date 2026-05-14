@@ -38,6 +38,7 @@ import {
     Heart,
     Utensils,
     Camera,
+    Mic,
     Mountain,
     Music,
     LogIn,
@@ -743,6 +744,7 @@ export default function Home() {
         return () => clearInterval(interval);
     }, []);
     const [destination, setDestination] = useState("");
+    const [isListening, setIsListening] = useState(false);
     const [days, setDays] = useState(5);
     const [travelers, setTravelers] = useState("Couple");
     const [budget, setBudget] = useState("Moderate");
@@ -1086,6 +1088,46 @@ export default function Home() {
         }
     }, [days, destination, showToast]);
 
+    const handleVoiceSearch = () => {
+        // Check for browser support
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert("Sorry, your browser doesn't support voice search. Try Chrome!");
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = () => {
+            setIsListening(true);
+        };
+
+        recognition.onresult = (event: any) => {
+            const transcript = event.results[0][0].transcript;
+            // Remove any trailing period the API sometimes adds
+            const cleanTranscript = transcript.replace(/\.$/, '');
+            
+            // Update the destination state with the spoken text
+            setDestination(cleanTranscript);
+            fetchSuggestions(cleanTranscript);
+            setIsListening(false);
+        };
+
+        recognition.onerror = (event: any) => {
+            console.error("Voice search error:", event.error);
+            setIsListening(false);
+        };
+
+        recognition.onend = () => {
+            setIsListening(false);
+        };
+
+        recognition.start();
+    };
+
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (!destination.trim()) return;
@@ -1315,8 +1357,21 @@ export default function Home() {
                                                     }}
                                                     autoComplete="off"
                                                     required
-                                                    className="w-full bg-transparent text-gray-900 dark:text-white font-medium py-3 pl-12 pr-4 focus:outline-none placeholder-gray-400 dark:placeholder-gray-500"
+                                                    className="w-full bg-transparent text-gray-900 dark:text-white font-medium py-3 pl-12 pr-12 focus:outline-none placeholder-gray-400 dark:placeholder-gray-500"
                                                 />
+                                                {/* The Voice Search Button */}
+                                                <button
+                                                    onClick={handleVoiceSearch}
+                                                    type="button"
+                                                    className={`absolute right-2 p-2 rounded-full transition-all duration-300 ${
+                                                        isListening 
+                                                            ? 'bg-red-500/20 text-red-500 animate-pulse shadow-[0_0_15px_rgba(239,68,68,0.4)]' 
+                                                            : 'text-gray-400 hover:text-teal-500 hover:bg-black/5 dark:hover:bg-white/5'
+                                                    }`}
+                                                    title="Search by voice"
+                                                >
+                                                    <Mic className="w-5 h-5" />
+                                                </button>
                                             </div>
                                             <AnimatePresence>
                                                 {showSuggestions && suggestions.length > 0 && (
