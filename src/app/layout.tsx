@@ -24,6 +24,10 @@ export const metadata: Metadata = {
   description:
     "Plan your dream trip in seconds. Trekko AI builds personalized, day-by-day itineraries tailored to your budget and travel style.",
   keywords: ["trip planner", "AI travel", "itinerary generator", "travel AI", "Trekko"],
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
   openGraph: {
     title: "Trekko — AI Trip Planner",
     description:

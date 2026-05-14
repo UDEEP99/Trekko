@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Map, Sparkles, Globe, Plane, Navigation, CalendarDays, Wallet } from "lucide-react";
+import { ArrowRight, Map, Sparkles, Globe, Navigation, CalendarDays, Wallet } from "lucide-react";
 import ThemeToggle from "./components/ThemeToggle";
 
 export default function LandingPage() {
@@ -12,10 +12,20 @@ export default function LandingPage() {
             {/* Navbar */}
             <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-white/40 dark:bg-slate-950/40 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50">
                 <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-500 to-cyan-500 flex items-center justify-center shadow-md">
-                        <Plane className="w-5 h-5 text-white" />
-                    </div>
-                    <span className="text-xl font-extrabold text-gradient tracking-tight font-serif">
+                    <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="logoGradNav" x1="0" y1="0" x2="34" y2="34" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stopColor="#f97316" />
+                                <stop offset="100%" stopColor="#06b6d4" />
+                            </linearGradient>
+                        </defs>
+                        {/* Mountain peaks */}
+                        <path d="M4 27L12 11L17 19L22 13L30 27Z" fill="url(#logoGradNav)" opacity="0.9" />
+                        {/* Location pin above main peak */}
+                        <circle cx="22" cy="9" r="3.5" fill="url(#logoGradNav)" />
+                        <path d="M22 12.5 L22 16" stroke="url(#logoGradNav)" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                    <span className="text-lg font-light tracking-[0.18em] uppercase text-slate-800 dark:text-slate-100" style={{letterSpacing: '0.18em'}}>
                         Trekko
                     </span>
                 </div>
@@ -143,10 +153,18 @@ export default function LandingPage() {
             {/* Footer */}
             <footer className="py-8 px-6 border-t border-slate-200 dark:border-slate-800 text-center flex flex-col md:flex-row items-center justify-between max-w-7xl mx-auto text-slate-500 dark:text-slate-400 text-sm">
                 <div className="flex items-center gap-2.5 mb-4 md:mb-0">
-                    <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-orange-500 to-cyan-500 flex items-center justify-center shadow-sm">
-                        <Plane className="w-4 h-4 text-white" />
-                    </div>
-                    <span className="text-lg font-extrabold text-gradient tracking-tight font-serif">
+                    <svg width="28" height="28" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="logoGradFooter" x1="0" y1="0" x2="34" y2="34" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stopColor="#f97316" />
+                                <stop offset="100%" stopColor="#06b6d4" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M4 27L12 11L17 19L22 13L30 27Z" fill="url(#logoGradFooter)" opacity="0.85" />
+                        <circle cx="22" cy="9" r="3.5" fill="url(#logoGradFooter)" />
+                        <path d="M22 12.5 L22 16" stroke="url(#logoGradFooter)" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                    <span className="text-sm font-light tracking-[0.18em] uppercase text-slate-700 dark:text-slate-300" style={{letterSpacing: '0.18em'}}>
                         Trekko
                     </span>
                 </div>

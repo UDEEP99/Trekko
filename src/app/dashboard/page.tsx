@@ -1143,10 +1143,18 @@ export default function Home() {
                                 animate={{ opacity: 1, x: 0 }}
                             >
                                 <Link href="/" className="flex items-center gap-2.5 cursor-pointer">
-                                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-500 to-cyan-500 flex items-center justify-center shadow-md">
-                                        <Plane className="w-4.5 h-4.5 text-white" />
-                                    </div>
-                                    <span className="text-xl font-extrabold text-gradient tracking-tight font-serif">
+                                    <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <defs>
+                                            <linearGradient id="logoGradDash" x1="0" y1="0" x2="34" y2="34" gradientUnits="userSpaceOnUse">
+                                                <stop offset="0%" stopColor="#f97316" />
+                                                <stop offset="100%" stopColor="#06b6d4" />
+                                            </linearGradient>
+                                        </defs>
+                                        <path d="M4 27L12 11L17 19L22 13L30 27Z" fill="url(#logoGradDash)" opacity="0.9" />
+                                        <circle cx="22" cy="9" r="3.5" fill="url(#logoGradDash)" />
+                                        <path d="M22 12.5 L22 16" stroke="url(#logoGradDash)" strokeWidth="2" strokeLinecap="round" />
+                                    </svg>
+                                    <span className="text-lg font-light tracking-[0.18em] uppercase text-white" style={{letterSpacing: '0.18em'}}>
                                         Trekko
                                     </span>
                                 </Link>
