@@ -3,6 +3,8 @@ import { Inter, Playfair_Display } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import Providers from "./components/Providers";
 import "./globals.css";
+import WatsonAssistantChat from "./components/WatsonAssistantChat";
+
 
 const inter = Inter({
   subsets: ["latin"],
@@ -41,6 +43,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <Providers>
             {children}
+            <WatsonAssistantChat />
           </Providers>
         </ThemeProvider>
       </body>
