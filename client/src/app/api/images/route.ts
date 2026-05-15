@@ -45,7 +45,7 @@ export async function GET() {
       throw new Error("No results found from Unsplash");
     }
 
-    const destinations = data.results.map((item: any) => ({
+    const destinations = data.results.map((item: { user?: { location?: string }, alt_description?: string, urls: { regular?: string, full?: string } }) => ({
       name: item.user?.location || item.alt_description || "Tropical Resort",
       image: item.urls.regular || item.urls.full
     }));

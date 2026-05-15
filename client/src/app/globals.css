@@ -72,10 +72,11 @@ body {
 /* ─── Glassmorphism (Warm Holiday Tint) ─── */
 @layer components {
   .glass {
-    background: rgba(255, 255, 255, 0.65);
-    backdrop-filter: blur(20px) saturate(160%);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
-    border: 1px solid rgba(255, 247, 237, 0.6);
+    background: rgba(255, 255, 255, 0.30);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(255, 247, 237, 0.45);
+    box-shadow: 0 4px 24px rgba(249, 115, 22, 0.06), 0 1px 0 rgba(255,255,255,0.5) inset;
   }
 
   .dark .glass {
@@ -84,10 +85,11 @@ body {
   }
 
   .glass-strong {
-    background: rgba(255, 255, 255, 0.82);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid rgba(255, 237, 213, 0.7);
+    background: rgba(255, 255, 255, 0.38);
+    backdrop-filter: blur(32px) saturate(200%);
+    -webkit-backdrop-filter: blur(32px) saturate(200%);
+    border: 1px solid rgba(255, 237, 213, 0.50);
+    box-shadow: 0 8px 32px rgba(249, 115, 22, 0.07), 0 1px 0 rgba(255,255,255,0.6) inset;
   }
 
   .dark .glass-strong {
@@ -96,10 +98,11 @@ body {
   }
 
   .glass-navbar {
-    background: rgba(255, 253, 248, 0.78);
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
-    border-bottom: 1px solid rgba(251, 191, 36, 0.15);
+    background: rgba(255, 253, 248, 0.35);
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border-bottom: 1px solid rgba(251, 191, 36, 0.20);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.55) inset;
   }
 
   .dark .glass-navbar {
@@ -109,14 +112,14 @@ body {
 
   /* ─── Floating Map Glass ─── */
   .glass-map {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(20px) saturate(160%);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
-    border: 1.5px solid rgba(249, 115, 22, 0.25);
+    background: rgba(255, 255, 255, 0.28);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1.5px solid rgba(249, 115, 22, 0.20);
     box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.08),
-      0 0 0 1px rgba(255, 255, 255, 0.2) inset,
-      0 0 20px rgba(249, 115, 22, 0.06);
+      0 8px 32px rgba(0, 0, 0, 0.06),
+      0 0 0 1px rgba(255, 255, 255, 0.45) inset,
+      0 0 20px rgba(249, 115, 22, 0.05);
   }
 
   .dark .glass-map {

@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Trekko
 
-## Getting Started
+Trekko is a modern, AI-powered travel application designed to provide users with curated, personalized trip itineraries. The application features a decoupled architecture with a Next.js frontend and an Express.js backend, utilizing advanced AI integrations for trip planning and a highly responsive, animated user interface.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **AI-Powered Trip Planning**: Leverages Groq and OpenAI SDKs to generate curated, personalized activity data and itineraries.
+- **Modern User Interface**: Features a polished aesthetic with dark mode support, glassmorphism effects, smooth motion-based animations (Framer Motion & GSAP), and professional iconography (Lucide React).
+- **Decoupled Architecture**: Clean separation of concerns with a Next.js client frontend and a Node.js/Express backend API.
+- **Robust Authentication**: Secure user authentication and session management (NextAuth / Firebase Auth) with per-user data isolation.
+- **Persistent Data Storage**: Uses IBM Cloudant (NoSQL) as the cloud database backend for cross-device storage of user profiles and saved itineraries, with `localStorage` serving as an offline fallback.
+
+## 🛠️ Technology Stack
+
+### Frontend (Root Directory)
+- **Framework**: Next.js (v14), React (v18)
+- **Styling**: TailwindCSS, PostCSS
+- **Animations**: Framer Motion, GSAP
+- **State/Auth**: NextAuth, next-themes
+- **Database ORM**: Prisma
+- **AI Integrations**: AI SDK, Groq SDK, OpenAI
+- **Icons**: Lucide React
+
+### Backend (`/backend` Directory)
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Database**: IBM Cloudant
+- **AI Integration**: Groq SDK
+- **Utilities**: CORS, Dotenv
+
+## 📂 Project Structure
+
+```
+Trekko/
+├── backend/                # Node.js/Express API server
+│   ├── server.js           # Main Express server entry point
+│   ├── package.json        # Backend dependencies
+│   └── .env                # Backend environment variables
+├── src/                    # Next.js frontend source code
+├── package.json            # Frontend dependencies
+├── tailwind.config.ts      # Tailwind styling configuration
+├── next.config.mjs         # Next.js configuration
+├── tsconfig.json           # TypeScript configuration
+└── .env.local              # Frontend environment variables
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ⚙️ Getting Started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Ensure you have Node.js and npm installed on your system. You will also need active credentials for IBM Cloudant, Firebase/NextAuth, and API keys for Groq/OpenAI.
 
-## Learn More
+### 1. Backend Setup
 
-To learn more about Next.js, take a look at the following resources:
+Navigate to the backend directory, install dependencies, and start the development server:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+cd backend
+npm install
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+*Note: Ensure you have configured the `.env` file in the `backend/` directory with your IBM Cloudant credentials and Groq API keys.*
 
-## Deploy on Vercel
+### 2. Frontend Setup
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+In a new terminal window, navigate to the project root, install dependencies, and start the Next.js development server:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm install
+npm run dev
+```
+
+*Note: Ensure you have configured the `.env.local` file in the root directory with your NextAuth, database, and AI SDK credentials.*
+
+The frontend will be available at `http://localhost:3000` and it will communicate with the local Express backend.
+
+## 📝 License
+
+This project is private and proprietary.

@@ -1,11 +1,68 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
 const Groq = require("groq-sdk").default;
+const { CloudantV1, IamAuthenticator } = require("@ibm-cloud/cloudant");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+/* ─── IBM Cloudant Setup ─── */
+const DB_USERS = "trekko-users";
+const DB_TRIPS = "trekko-trips";
+
+let cloudant = null;
+
+function initCloudant() {
+  const url = process.env.CLOUDANT_URL;
+  const apikey = process.env.CLOUDANT_APIKEY;
+
+  if (!url || url.includes("YOUR_INSTANCE") || !apikey || apikey.includes("YOUR_IAM")) {
+    console.warn("⚠️  Cloudant credentials not configured — DB features will be disabled.");
+    console.warn("   Set CLOUDANT_URL and CLOUDANT_APIKEY in server/.env to enable.");
+    return null;
+  }
+
+  try {
+    const authenticator = new IamAuthenticator({ apikey });
+    const client = new CloudantV1({ authenticator });
+    client.setServiceUrl(url);
+    console.log("✅ IBM Cloudant client initialized.");
+    return client;
+  } catch (err) {
+    console.error("❌ Cloudant init failed:", err.message);
+    return null;
+  }
+}
+
+async function ensureDatabase(client, dbName) {
+  try {
+    await client.getDatabaseInformation({ db: dbName });
+    console.log(`📦 Cloudant DB "${dbName}" exists.`);
+  } catch (err) {
+    if (err.status === 404) {
+      await client.putDatabase({ db: dbName });
+      console.log(`📦 Cloudant DB "${dbName}" created.`);
+    } else {
+      throw err;
+    }
+  }
+}
+
+async function setupCloudant() {
+  cloudant = initCloudant();
+  if (!cloudant) return;
+  try {
+    await ensureDatabase(cloudant, DB_USERS);
+    await ensureDatabase(cloudant, DB_TRIPS);
+    console.log("✅ Cloudant databases ready.\n");
+  } catch (err) {
+    console.error("❌ Cloudant DB setup error:", err.message);
+    cloudant = null;
+  }
+}
 
 /* ─── Middleware ─── */
 app.use(
@@ -18,7 +75,7 @@ app.use(express.json());
 
 /* ─── Health Check ─── */
 app.get("/", (_req, res) => {
-  res.json({ status: "ok", message: "Carvaan API is running 🚀" });
+  res.json({ status: "ok", message: "Trekko API is running 🚀" });
 });
 
 /* ═══════════════════════════════════════════════════════════════
@@ -529,13 +586,175 @@ Generate a complete day-by-day itinerary following the exact JSON structure from
   }
 });
 
-/* ─── Start Server ─── */
-app.listen(PORT, () => {
-  console.log(`\n🚀 Carvaan API server running at http://localhost:${PORT}`);
-  console.log("🌊 Smart Waterfall Architecture Active:");
-  console.log("   Hotels/Restaurants/Cafés → Foursquare → Unsplash → Pexels");
-  console.log("   Landmarks/Monuments/Cities → WikiMedia → Unsplash → Pexels");
-  console.log(`   Unsplash Key: ${process.env.UNSPLASH_ACCESS_KEY ? "✅ Set" : "❌ Missing"}`);
-  console.log(`   Pexels Key:   ${process.env.PEXELS_API_KEY ? "✅ Set" : "❌ Missing"}`);
-  console.log(`   Foursquare:   ${process.env.FOURSQUARE_API_KEY ? "✅ Set" : "❌ Missing"}\n`);
+
+/* ═══════════════════════════════════════════════════════════════
+   CLOUDANT — User Profile Routes
+   ═══════════════════════════════════════════════════════════════ */
+
+/**
+ * GET /api/user/:email
+ * Fetch user profile from Cloudant.
+ */
+app.get("/api/user/:email", async (req, res) => {
+  if (!cloudant) {
+    return res.status(503).json({ error: "Database not configured." });
+  }
+  const docId = `user::${req.params.email}`;
+  try {
+    const response = await cloudant.getDocument({ db: DB_USERS, docId });
+    return res.json(response.result);
+  } catch (err) {
+    if (err.status === 404) return res.status(404).json({ error: "User not found." });
+    console.error("GET /api/user error:", err.message);
+    return res.status(500).json({ error: "Failed to fetch user profile." });
+  }
 });
+
+/**
+ * POST /api/user
+ * Create or update a user profile.
+ * Body: { email, name }
+ */
+app.post("/api/user", async (req, res) => {
+  if (!cloudant) {
+    return res.status(503).json({ error: "Database not configured." });
+  }
+  const { email, name } = req.body;
+  if (!email) return res.status(400).json({ error: "email is required." });
+
+  const docId = `user::${email}`;
+  const now = Date.now();
+
+  try {
+    // Try to get existing doc to preserve _rev for updates
+    let rev;
+    try {
+      const existing = await cloudant.getDocument({ db: DB_USERS, docId });
+      rev = existing.result._rev;
+    } catch (e) {
+      if (e.status !== 404) throw e;
+    }
+
+    const doc = {
+      _id: docId,
+      ...(rev ? { _rev: rev } : {}),
+      email,
+      name: name || email,
+      lastSeen: now,
+      ...(rev ? {} : { createdAt: now }),
+    };
+
+    const response = await cloudant.putDocument({ db: DB_USERS, docId, document: doc });
+    return res.json({ ok: true, id: response.result.id, rev: response.result.rev });
+  } catch (err) {
+    console.error("POST /api/user error:", err.message);
+    return res.status(500).json({ error: "Failed to save user profile." });
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   CLOUDANT — Saved Trips Routes
+   ═══════════════════════════════════════════════════════════════ */
+
+/**
+ * GET /api/trips/:email
+ * Fetch all saved trips for a user.
+ */
+app.get("/api/trips/:email", async (req, res) => {
+  if (!cloudant) {
+    return res.status(503).json({ error: "Database not configured." });
+  }
+  const { email } = req.params;
+  const prefix = `trip::${email}::`;
+
+  try {
+    const response = await cloudant.allDocs({
+      db: DB_TRIPS,
+      includeDocs: true,
+      startKey: prefix,
+      endKey: prefix + "\ufff0",
+    });
+    const trips = response.result.rows
+      .filter((row) => !row.value.deleted)
+      .map((row) => row.doc);
+    return res.json({ trips });
+  } catch (err) {
+    console.error("GET /api/trips error:", err.message);
+    return res.status(500).json({ error: "Failed to fetch saved trips." });
+  }
+});
+
+/**
+ * POST /api/trips
+ * Save a new trip.
+ * Body: { email, tripData: { destination, days, budget, vibe, itinerary, savedAt } }
+ */
+app.post("/api/trips", async (req, res) => {
+  if (!cloudant) {
+    return res.status(503).json({ error: "Database not configured." });
+  }
+  const { email, tripData } = req.body;
+  if (!email || !tripData) {
+    return res.status(400).json({ error: "email and tripData are required." });
+  }
+
+  const savedAt = tripData.savedAt || Date.now();
+  const docId = `trip::${email}::${savedAt}`;
+
+  const doc = {
+    _id: docId,
+    userId: email,
+    destination: tripData.destination,
+    days: tripData.days,
+    budget: tripData.budget,
+    vibe: tripData.vibe,
+    itinerary: tripData.itinerary,
+    savedAt,
+  };
+
+  try {
+    const response = await cloudant.putDocument({ db: DB_TRIPS, docId, document: doc });
+    return res.json({ ok: true, id: response.result.id, rev: response.result.rev, savedAt });
+  } catch (err) {
+    console.error("POST /api/trips error:", err.message);
+    return res.status(500).json({ error: "Failed to save trip." });
+  }
+});
+
+/**
+ * DELETE /api/trips/:email/:tripId
+ * Delete a saved trip by its savedAt timestamp (tripId).
+ */
+app.delete("/api/trips/:email/:tripId", async (req, res) => {
+  if (!cloudant) {
+    return res.status(503).json({ error: "Database not configured." });
+  }
+  const { email, tripId } = req.params;
+  const docId = `trip::${email}::${tripId}`;
+
+  try {
+    const existing = await cloudant.getDocument({ db: DB_TRIPS, docId });
+    const rev = existing.result._rev;
+    await cloudant.deleteDocument({ db: DB_TRIPS, docId, rev });
+    return res.json({ ok: true });
+  } catch (err) {
+    if (err.status === 404) return res.status(404).json({ error: "Trip not found." });
+    console.error("DELETE /api/trips error:", err.message);
+    return res.status(500).json({ error: "Failed to delete trip." });
+  }
+});
+
+/* ─── Start Server ─── */
+setupCloudant().then(() => {
+  app.listen(PORT, () => {
+    console.log(`\n🚀 Trekko API server running at http://localhost:${PORT}`);
+    console.log("🌊 Smart Waterfall Architecture Active:");
+    console.log("   Hotels/Restaurants/Cafés → Foursquare → Unsplash → Pexels");
+    console.log("   Landmarks/Monuments/Cities → WikiMedia → Unsplash → Pexels");
+    console.log(`   Unsplash Key:  ${process.env.UNSPLASH_ACCESS_KEY ? "✅ Set" : "❌ Missing"}`);
+    console.log(`   Pexels Key:    ${process.env.PEXELS_API_KEY ? "✅ Set" : "❌ Missing"}`);
+    console.log(`   Foursquare:    ${process.env.FOURSQUARE_API_KEY ? "✅ Set" : "❌ Missing"}`);
+    console.log(`   Cloudant DB:   ${cloudant ? "✅ Connected" : "⚠️  Not configured"}\n`);
+  });
+});
+
