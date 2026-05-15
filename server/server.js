@@ -21,7 +21,7 @@ function initCloudant() {
 
   if (!url || url.includes("YOUR_INSTANCE") || !apikey || apikey.includes("YOUR_IAM")) {
     console.warn("⚠️  Cloudant credentials not configured — DB features will be disabled.");
-    console.warn("   Set CLOUDANT_URL and CLOUDANT_APIKEY in backend/.env to enable.");
+    console.warn("   Set CLOUDANT_URL and CLOUDANT_APIKEY in server/.env to enable.");
     return null;
   }
 
@@ -75,7 +75,7 @@ app.use(express.json());
 
 /* ─── Health Check ─── */
 app.get("/", (_req, res) => {
-  res.json({ status: "ok", message: "Carvaan API is running 🚀" });
+  res.json({ status: "ok", message: "Trekko API is running 🚀" });
 });
 
 /* ═══════════════════════════════════════════════════════════════

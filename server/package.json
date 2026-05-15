@@ -1,7 +1,7 @@
 {
-  "name": "carvaan-backend",
+  "name": "trekko-backend",
   "version": "1.0.0",
-  "description": "Carvaan Express API Server",
+  "description": "Trekko Express API Server",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

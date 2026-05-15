@@ -21,7 +21,6 @@ import {
     Sparkles,
     Sun,
     Moon,
-    ChevronDown,
     AlertCircle,
     X,
     Compass,
@@ -223,79 +222,6 @@ function QuickBookings({ destination }: { destination: string }) {
     );
 }
 
-/* ─── Premium Custom Dropdown ─── */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function SelectField({
-    icon: Icon, label, value, onChange, options, id,
-}: {
-    icon: React.ElementType; label: string; value: string;
-    onChange: (v: string) => void; options: string[]; id: string;
-}) {
-    const [isOpen, setIsOpen] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
-
-    // Close on outside click
-    useEffect(() => {
-        function handleClickOutside(e: MouseEvent) {
-            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-                setIsOpen(false);
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
-
-    return (
-        <div className="relative group" ref={dropdownRef}>
-            <label htmlFor={id} className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1.5">{label}</label>
-            <button
-                type="button"
-                id={id}
-                onClick={() => setIsOpen((prev) => !prev)}
-                className="w-full flex items-center gap-2.5 pl-10 pr-4 py-3 bg-white/60 dark:bg-slate-800/60 border border-orange-100 dark:border-slate-600 rounded-xl text-slate-700 dark:text-slate-200 text-sm text-left focus:outline-none focus:ring-2 focus:ring-orange-300/40 dark:focus:ring-cyan-400/30 focus:border-orange-400 dark:focus:border-cyan-500 transition-all duration-300 animate-glow-pulse hover:border-orange-300 dark:hover:border-slate-500 relative cursor-pointer"
-            >
-                <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-500 dark:text-cyan-400" />
-                <span className="flex-1 truncate font-medium">{value}</span>
-                <ChevronDown className={`w-4 h-4 text-slate-400 dark:text-slate-500 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
-            </button>
-
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.ul
-                        initial={{ opacity: 0, y: -6, scale: 0.97 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -6, scale: 0.97 }}
-                        transition={{ duration: 0.18, ease: "easeOut" }}
-                        className="absolute z-50 left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-orange-100/60 dark:border-slate-700 rounded-lg shadow-xl overflow-hidden py-1"
-                        style={{ transformOrigin: "top" }}
-                    >
-                        {options.map((option) => (
-                            <li key={option}>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        onChange(option);
-                                        setIsOpen(false);
-                                    }}
-                                    className={`w-full text-left px-4 py-2.5 text-sm transition-colors duration-150 flex items-center gap-2.5 ${value === option
-                                        ? "bg-orange-50 dark:bg-slate-700 text-orange-600 dark:text-orange-400 font-semibold"
-                                        : "text-slate-700 dark:text-slate-300 hover:bg-orange-50 dark:hover:bg-slate-700 dark:hover:text-orange-400"
-                                        }`}
-                                >
-                                    {value === option && (
-                                        <span className="w-1.5 h-1.5 rounded-full bg-orange-500 dark:bg-orange-400 flex-shrink-0" />
-                                    )}
-                                    <span className={value === option ? "" : "ml-4"}>{option}</span>
-                                </button>
-                            </li>
-                        ))}
-                    </motion.ul>
-                )}
-            </AnimatePresence>
-        </div>
-    );
-}
-
 /* ─── Category Icon for Activity Cards ─── */
 function CategoryIcon({ category, time }: { category?: string; time: string }) {
     const cat = (category || "").toLowerCase();
@@ -332,7 +258,6 @@ function ActivityCard({
     animDelay: number;
 }) {
     const imageUrl = activity.imageUrl || null;
-    console.log("Card Image Prop Received:", activity.place, "→", activity.imageUrl);
     const [imgStatus, setImgStatus] = useState<"loading" | "loaded" | "error">(
         imageUrl ? "loading" : "error"
     );
@@ -563,7 +488,7 @@ const splashWordVariants: Variants = {
 };
 
 function SplashBanner({ onStart }: { onStart: () => void }) {
-    const headline = "Get start your trip with Trekko";
+    const headline = "Get started on your trip with Trekko";
     const words = headline.split(" ");
 
     return (
