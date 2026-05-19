@@ -619,7 +619,7 @@ app.post("/api/user", async (req, res) => {
   if (!cloudant) {
     return res.status(503).json({ error: "Database not configured." });
   }
-  const { email, name } = req.body;
+  const { email, name, phone, status } = req.body;
   if (!email) return res.status(400).json({ error: "email is required." });
 
   const docId = `user::${email}`;
@@ -640,6 +640,8 @@ app.post("/api/user", async (req, res) => {
       ...(rev ? { _rev: rev } : {}),
       email,
       name: name || email,
+      ...(phone !== undefined ? { phone } : (rev && existing?.result?.phone) ? { phone: existing.result.phone } : {}),
+      ...(status !== undefined ? { status } : (rev && existing?.result?.status) ? { status: existing.result.status } : { status: "Active" }),
       lastSeen: now,
       ...(rev ? {} : { createdAt: now }),
     };

@@ -14,6 +14,8 @@ export interface CloudantUserProfile {
   _rev?: string;
   email: string;
   name: string;
+  phone?: string;
+  status?: string;
   createdAt: number;
   lastSeen: number;
 }
@@ -52,12 +54,15 @@ export async function getUserProfile(email: string): Promise<CloudantUserProfile
  * Called on every sign-in to keep lastSeen current.
  * Returns false if the DB is unavailable.
  */
-export async function upsertUserProfile(email: string, name: string): Promise<boolean> {
+export async function upsertUserProfile(
+  email: string,
+  data: { name?: string; phone?: string; status?: string }
+): Promise<boolean> {
   try {
     const res = await fetch(`${BACKEND}/api/user`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, name }),
+      body: JSON.stringify({ email, ...data }),
     });
     return res.ok;
   } catch {

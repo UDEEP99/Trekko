@@ -1,20 +1,21 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Playfair_Display, DM_Sans } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import Providers from "./components/Providers";
 import "./globals.css";
 import WatsonAssistantChat from "./components/WatsonAssistantChat";
 
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-dm-sans",
   display: "swap",
 });
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
+  weight: ["400", "600", "700", "800", "900"],
+  style: ["normal", "italic"],
   variable: "--font-playfair",
   display: "swap",
 });
@@ -42,9 +43,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
-      <body className="font-sans antialiased min-h-screen bg-page-gradient dark:bg-page-gradient-dark transition-colors duration-500">
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+    <html lang="en" className={`${dmSans.variable} ${playfair.variable}`} suppressHydrationWarning>
+      <body className="font-sans antialiased min-h-screen landing-bg">
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <Providers>
             {children}
             <WatsonAssistantChat />
